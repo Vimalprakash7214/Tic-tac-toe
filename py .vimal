@@ -1,0 +1,112 @@
+import pygame
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Set constants
+WIDTH = 300
+HEIGHT = 300
+LINE_WIDTH = 15
+BOARD_ROWS = 3
+BOARD_COLS = 3
+SQUARE_SIZE = WIDTH // BOARD_COLS
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+
+# Create the screen
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Tic Tac Toe")
+screen.fill(WHITE)
+
+# Define the board
+board = [[' ' for _ in range(BOARD_COLS)] for _ in range(BOARD_ROWS)]
+
+# Draw grid lines
+def draw_grid():
+    for i in range(1, BOARD_ROWS):
+        pygame.draw.line(screen, BLACK, (0, i * SQUARE_SIZE), (WIDTH, i * SQUARE_SIZE), LINE_WIDTH)
+        pygame.draw.line(screen, BLACK, (i * SQUARE_SIZE, 0), (i * SQUARE_SIZE, HEIGHT), LINE_WIDTH)
+
+# Draw X's and O's
+def draw_board():
+    for row in range(BOARD_ROWS):
+        for col in range(BOARD_COLS):
+            if board[row][col] == 'X':
+                pygame.draw.line(screen, RED, (col * SQUARE_SIZE + 15, row * SQUARE_SIZE + 15), 
+                                 ((col + 1) * SQUARE_SIZE - 15, (row + 1) * SQUARE_SIZE - 15), 5)
+                pygame.draw.line(screen, RED, ((col + 1) * SQUARE_SIZE - 15, row * SQUARE_SIZE + 15), 
+                                 (col * SQUARE_SIZE + 15, (row + 1) * SQUARE_SIZE - 15), 5)
+            elif board[row][col] == 'O':
+                pygame.draw.circle(screen, BLUE, (col * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), SQUARE_SIZE // 2 - 15, 5)
+
+# Check for winner
+def check_winner():
+    # Check rows
+    for row in range(BOARD_ROWS):
+        if board[row][0] == board[row][1] == board[row][2] != ' ':
+            return board[row][0]
+
+    # Check columns
+    for col in range(BOARD_COLS):
+        if board[0][col] == board[1][col] == board[2][col] != ' ':
+            return board[0][col]
+
+    # Check diagonals
+    if board[0][0] == board[1][1] == board[2][2] != ' ':
+        return board[0][0]
+    if board[0][2] == board[1][1] == board[2][0] != ' ':
+        return board[0][2]
+
+    # Check for draw
+    if all(all(cell != ' ' for cell in row) for row in board):
+        return 'draw'
+
+    return None
+
+# Main game loop
+def main():
+    player = 'X'
+    game_over = False
+
+    while not game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN and not game_over:
+                mouseX = event.pos[0]
+                mouseY = event.pos[1]
+
+                clicked_row = mouseY // SQUARE_SIZE
+                clicked_col = mouseX // SQUARE_SIZE
+
+                if board[clicked_row][clicked_col] == ' ':
+                    board[clicked_row][clicked_col] = player
+                    if player == 'X':
+                        player = 'O'
+                    else:
+                        player = 'X'
+
+                    draw_board()
+
+                    winner = check_winner()
+                    if winner:
+                        game_over = True
+                        if winner != 'draw':
+                            print(f"Player {winner} wins!")
+                        else:
+                            print("It's a draw!")
+
+                    pygame.display.update()
+
+    pygame.quit()
+
+if _name_ == "_main_":
+    main()
+```
